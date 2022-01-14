@@ -14,6 +14,7 @@ import urllib.parse
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+size = 64
 m = nn.ReLU(inplace=True)
 
 A = np.loadtxt('vector_normal.txt')
@@ -46,8 +47,42 @@ all_requests = np.concatenate([normal, anomalous])  # 把两个矩阵第一个�
 X = all_requests
 X = torch.tensor(X)
 # print(X.shape)=torch.Size([60668, 1960])
+# print(X[0])
+# print(X[0].shape)  =torch.Size([1960])
 
+
+# print(XX[0].shape)=torch.Size([56, 35])
 y_normal = np.zeros(shape=(normal.shape[0]), dtype='int')
 y_anomalous = np.ones(shape=(anomalous.shape[0]), dtype='int')
 y = np.concatenate([y_normal, y_anomalous])
 y = torch.tensor(y)
+# -----------------------
+data_dataset = TensorDataset(X, y)
+
+XX = []
+YY = []
+train_loader = DataLoader(dataset=data_dataset, batch_size=size, shuffle=True)
+for idx, datat in enumerate(train_loader):
+    inputs, labels = datat
+    XX.append(inputs)
+    YY.append(labels)
+
+X_train, X_test, y_train, y_test = train_test_split(XX, YY, test_size=0.2, random_state=666)
+'''
+print(X_train[0])
+print(X_train[0].shape,'+++++++++++++') = torch.Size([64, 1960])
+print(y_train[0])
+print(y_train[0].shape,'+++++++++++++') = torch.Size([64])
+'''
+XXX = []
+for i in range(len(X)):
+    XXX.append(X[i].reshape(56, 35))
+
+
+
+
+
+
+
+
+
