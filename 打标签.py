@@ -13,6 +13,7 @@ from gensim import corpora
 import urllib.parse
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import time
 
 size = 1
 m = nn.ReLU(inplace=True)
@@ -162,9 +163,6 @@ def train(ano, data):
     print(loss)
 
 
-
-
-
 def test(ano, data):
     W = 0
     z1 = torch.matmul(w1, data) + b1
@@ -194,12 +192,16 @@ def test(ano, data):
     # print(W)
     return W
 
-WW=0
+
+WW = 0
 if __name__ == '__main__':
-    print(len(X_test),'+++++++++++++++++++')
+    start = time.time()
+    print(len(X_test), '+++++++++++++++++++')
     for i in range(len(X_train)):
         train(y_train[i], X_train[i])
     for j in range(len(X_test)):
         W = test(y_test[j], X_test[j])
         WW = WW + W
     print('TURE = ', WW / (len(X_test) * size))
+    end = time.time()
+    print("运行时间:%.2f秒"%(end-start))
