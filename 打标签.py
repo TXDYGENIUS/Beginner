@@ -51,7 +51,7 @@ X = X.reshape(len(X), 56, 35)
 # print(X.shape)=torch.Size([60668, 1960])
 # print(X[0])
 # print(X[0].shape)  =torch.Size([1960])
-
+# print(len(X[0][0]),'////////////////')
 
 # print(XX[0].shape)=torch.Size([56, 35])
 y_normal = np.zeros(shape=(normal.shape[0]), dtype='int')
@@ -76,16 +76,66 @@ print(X_train[0].shape, '+++++++++++++')  # = torch.Size([64, 56, 35])
 print(y_train[0])
 print(y_train[0].shape, '+++++++++++++')  # = torch.Size([64])
 '''
-w1 = torch.randn([20, 56], requires_grad=True, dtype=float)
+
+
+def average(a, b, c, d, e, f, g, h, i):
+    x = a + b + c + d + e + f + g + h + i
+    return x / 9
+
+
+def max(a, b, c, d, e, f, g, h, i):
+    aa = []
+    x = 0
+    aa.append(a, b, c, d, e, f, g, h, i)
+    for i in range(len(aa) - 1):
+        if aa[i] > aa[i + 1]:
+            x = aa[i]
+        else:
+            x = aa[i + 1]
+    return x
+
+
+def pool(a):
+    lie = []
+    for i in range(len(a) - 2):
+        if i % 3 == 0:
+            hang = []
+            for j in range(len(a[0]) - 2):
+                if j % 3 == 0:
+                    x = average(a[i][j], a[i][j + 1], a[i][j + 2], a[i + 1][j], a[i + 1][j + 1], a[i + 1][j + 2],
+                                a[i + 2][j],
+                                a[i + 2][j + 1], a[i + 2][j + 2])
+                    hang.append(x)
+            lie.append(hang)
+    ss = torch.tensor(lie)
+    # print(ss)
+    return ss
+
+
+# ++++++++++++++++++++++++++++++++
+
+for p in range(len(X_train)):
+    # print(X_train[p].shape,'////////////')   torch.Size([1, 56, 35])
+    X_train[p] = X_train[p].reshape(56, 35)
+    # print(pool(X_train[p]).shape)   torch.Size([18, 11])
+    X_train[p] = pool(X_train[p])
+for p in range(len(X_test)):
+    # print(X_train[p].shape,'////////////')   torch.Size([1, 56, 35])
+    X_test[p] = X_test[p].reshape(56, 35)
+    # print(pool(X_train[p]).shape)   torch.Size([18, 11])
+    X_test[p] = pool(X_test[p])
+# ++++++++++++++++++++++++++++++++
+w1 = torch.randn([20, len(X_train[0])], requires_grad=True, dtype=float)
+print(len(X_train[0][0]), '   111')  # =18
 w2 = torch.randn([10, 20], requires_grad=True, dtype=float)
 w3 = torch.randn([4, 10], requires_grad=True, dtype=float)
 w4 = torch.randn([1, 4], requires_grad=True, dtype=float)
-b1 = torch.randn([20, 35], requires_grad=True, dtype=float)
-b2 = torch.randn([10, 35], requires_grad=True, dtype=float)
-b3 = torch.randn([4, 35], requires_grad=True, dtype=float)
-b4 = torch.randn([1, 35], requires_grad=True, dtype=float)
+b1 = torch.randn([20, len(X_train[0][0])], requires_grad=True, dtype=float)
+b2 = torch.randn([10, len(X_train[0][0])], requires_grad=True, dtype=float)
+b3 = torch.randn([4, len(X_train[0][0])], requires_grad=True, dtype=float)
+b4 = torch.randn([1, len(X_train[0][0])], requires_grad=True, dtype=float)
 
-ww1 = torch.randn([35, 10], requires_grad=True, dtype=float)
+ww1 = torch.randn([len(X_train[0][0]), 10], requires_grad=True, dtype=float)
 ww2 = torch.randn([10, 4], requires_grad=True, dtype=float)
 ww3 = torch.randn([4, 1], requires_grad=True, dtype=float)
 bb1 = torch.randn([1, 10], requires_grad=True, dtype=float)
@@ -160,7 +210,7 @@ def train(ano, data):
     bb1.data = bb1.data - bb1.grad * learn
     bb2.data = bb2.data - bb2.grad * learn
     bb3.data = bb3.data - bb3.grad * learn
-    print(loss)
+    # print(loss)
 
 
 def test(ano, data):
@@ -197,6 +247,7 @@ WW = 0
 if __name__ == '__main__':
     start = time.time()
     print(len(X_test), '+++++++++++++++++++')
+
     for i in range(len(X_train)):
         train(y_train[i], X_train[i])
     for j in range(len(X_test)):
@@ -204,4 +255,4 @@ if __name__ == '__main__':
         WW = WW + W
     print('TURE = ', WW / (len(X_test) * size))
     end = time.time()
-    print("运行时间:%.2f秒"%(end-start))
+    print("运行时间:%.2f秒" % (end - start))
