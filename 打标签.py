@@ -86,13 +86,25 @@ def average(a, b, c, d, e, f, g, h, i):
 def max(a, b, c, d, e, f, g, h, i):
     aa = []
     x = 0
-    aa.append(a, b, c, d, e, f, g, h, i)
-    for i in range(len(aa) - 1):
-        if aa[i] > aa[i + 1]:
-            x = aa[i]
-        else:
-            x = aa[i + 1]
-    return x
+    aa.append(a)
+    aa.append(b)
+    aa.append(c)
+    aa.append(d)
+    aa.append(e)
+    aa.append(f)
+    aa.append(g)
+    aa.append(h)
+    aa.append(i)
+    aa.sort(reverse=True)
+    x = (aa[0] + aa[1]) / 2
+    y = 0
+    for i in range(7):
+        y = y + aa[2 + i]
+    y = y / 7
+    if x != 0:
+        return (x - y) * y / x
+    if x == 0:
+        return x
 
 
 def pool(a):
@@ -102,14 +114,30 @@ def pool(a):
             hang = []
             for j in range(len(a[0]) - 2):
                 if j % 3 == 0:
-                    x = average(a[i][j], a[i][j + 1], a[i][j + 2], a[i + 1][j], a[i + 1][j + 1], a[i + 1][j + 2],
-                                a[i + 2][j],
-                                a[i + 2][j + 1], a[i + 2][j + 2])
+                    x = max(a[i][j], a[i][j + 1], a[i][j + 2], a[i + 1][j], a[i + 1][j + 1], a[i + 1][j + 2],
+                            a[i + 2][j],
+                            a[i + 2][j + 1], a[i + 2][j + 2])
                     hang.append(x)
             lie.append(hang)
     ss = torch.tensor(lie)
     # print(ss)
     return ss
+
+
+def zbpool(a):
+    lie = []
+    for i in range(len(a) - 2):
+        hang = []
+        for j in range(len(a[0]) - 2):
+            x = max(a[i][j], a[i][j + 1], a[i][j + 2], a[i + 1][j], a[i + 1][j + 1], a[i + 1][j + 2], a[i + 2][j],
+                        a[i + 2][j + 1], a[i + 2][j + 2])
+            hang.append(x)
+            # h = torch.tensor(hang)
+            # print(h)
+        lie.append(hang)
+        # print(lie)
+    l = torch.tensor(lie)
+    return l
 
 
 # ++++++++++++++++++++++++++++++++
@@ -118,12 +146,12 @@ for p in range(len(X_train)):
     # print(X_train[p].shape,'////////////')   torch.Size([1, 56, 35])
     X_train[p] = X_train[p].reshape(56, 35)
     # print(pool(X_train[p]).shape)   torch.Size([18, 11])
-    X_train[p] = pool(X_train[p])
+    #X_train[p] = zbpool(X_train[p])
 for p in range(len(X_test)):
     # print(X_train[p].shape,'////////////')   torch.Size([1, 56, 35])
     X_test[p] = X_test[p].reshape(56, 35)
     # print(pool(X_train[p]).shape)   torch.Size([18, 11])
-    X_test[p] = pool(X_test[p])
+    #X_test[p] = zbpool(X_test[p])
 # ++++++++++++++++++++++++++++++++
 w1 = torch.randn([20, len(X_train[0])], requires_grad=True, dtype=float)
 print(len(X_train[0][0]), '   111')  # =18
@@ -243,16 +271,23 @@ def test(ano, data):
     return W
 
 
-WW = 0
 if __name__ == '__main__':
-    start = time.time()
-    print(len(X_test), '+++++++++++++++++++')
+    TT = 0
+    TIME = 0
+    for u in range(10):
+        WW = 0
+        start = time.time()
+        # print(len(X_test) )
 
-    for i in range(len(X_train)):
-        train(y_train[i], X_train[i])
-    for j in range(len(X_test)):
-        W = test(y_test[j], X_test[j])
-        WW = WW + W
-    print('TURE = ', WW / (len(X_test) * size))
-    end = time.time()
-    print("运行时间:%.2f秒" % (end - start))
+        for i in range(len(X_train)):
+            train(y_train[i], X_train[i])
+        for j in range(len(X_test)):
+            W = test(y_test[j], X_test[j])
+            WW = WW + W
+        print('TURE = ', WW / (len(X_test) * size))
+        end = time.time()
+        print("运行时间:%.2f秒" % (end - start))
+        TIME = TIME + (end - start)
+        TT = TT + (WW / (len(X_test) * size))
+    print('平均时间： ', TIME / 10)
+    print('平均正确率： ', TT / 10)
